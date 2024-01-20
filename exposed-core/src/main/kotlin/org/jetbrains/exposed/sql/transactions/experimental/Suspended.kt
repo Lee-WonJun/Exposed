@@ -56,6 +56,22 @@ internal class TransactionCoroutineElement(
 }
 
 /**
+ * Represents a TransactionScope transaction associated with a specific [Database]. This class provides a convenient way to
+ * initiate and execute database transactions using Kotlin's DSL style.
+ *
+ * **Note**: The `invoke` operator function allows executing a block of code (`statement`) within the context of this transaction.
+ */
+data class newSuspendedTransaction (val db: Database) {
+    suspend operator fun <T> invoke(
+        context: CoroutineContext? = null,
+        transactionIsolation: Int? = null,
+        statement: suspend Transaction.() -> T
+    ): T = withTransactionScope(context, null, db, transactionIsolation) {
+        suspendedTransactionAsyncInternal(true, statement).await()
+    }
+}
+
+/**
  * Creates a new `TransactionScope` then calls the specified suspending [statement], suspends until it completes,
  * and returns the result.
  *
