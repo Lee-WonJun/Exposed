@@ -197,6 +197,18 @@ class ThreadLocalTransactionManager(
 }
 
 /**
+ * Represents a transaction associated with a specific [Database]. This class provides a convenient way to
+ * initiate and execute database transactions using Kotlin's DSL style.
+ *
+ * **Note**: The `invoke` operator function allows executing a block of code (`statement`) within the context of this transaction.
+ */
+data class transaction(val db: Database) {
+    operator fun <T> invoke(statement: Transaction.() -> T): T {
+        return transaction(db, statement)
+    }
+}
+
+/**
  * Creates a transaction then calls the [statement] block with this transaction as its receiver and returns the result.
  *
  * **Note** If the database value [db] is not set, the value used will be either the last [Database] instance created
